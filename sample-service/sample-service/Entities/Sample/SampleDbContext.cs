@@ -2,15 +2,15 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
-namespace sample_service.Entities.DbContext
+namespace sample_service.Entities.Sample
 {
-    public partial class DbContext : DbContext
+    public partial class SampleDbContext : DbContext
     {
-        public DbContext()
-        {
-        }
+        //public SampleDbContext()
+        //{
+        //}
 
-        public DbContext(DbContextOptions<DbContext> options)
+        public SampleDbContext(DbContextOptions<SampleDbContext> options)
             : base(options)
         {
         }
@@ -18,15 +18,16 @@ namespace sample_service.Entities.DbContext
         public virtual DbSet<City> City { get; set; }
         public virtual DbSet<Country> Country { get; set; }
         public virtual DbSet<District> District { get; set; }
+        public virtual DbSet<User> User { get; set; }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            if (!optionsBuilder.IsConfigured)
-            {
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                optionsBuilder.UseSqlServer("Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=xunit-test-sample-dotnet-core;Integrated Security=True");
-            }
-        }
+//        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+//        {
+//            if (!optionsBuilder.IsConfigured)
+//            {
+//#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
+//                optionsBuilder.UseSqlServer("Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=xunit-test-sample-dotnet-core;Integrated Security=True");
+//            }
+//        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -71,9 +72,25 @@ namespace sample_service.Entities.DbContext
                     .HasConstraintName("FK_District_City");
             });
 
-            OnModelCreatingPartial(modelBuilder);
+            modelBuilder.Entity<User>(entity =>
+            {
+                entity.Property(e => e.CreateDate)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.Email).IsRequired();
+
+                entity.Property(e => e.Lastname).IsRequired();
+
+                entity.Property(e => e.Password).IsRequired();
+
+                entity.Property(e => e.Status)
+                    .IsRequired()
+                    .HasDefaultValueSql("((1))");
+            });
+
+            base.OnModelCreating(modelBuilder);
         }
 
-        partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
     }
 }

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace sample_service.Entities.DbContext
+namespace sample_service.Entities.Sample
 {
     public partial class Country
     {
