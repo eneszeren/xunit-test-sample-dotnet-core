@@ -32,14 +32,14 @@ namespace sample_service
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
-        public IServiceProvider ConfigureServices(IServiceCollection services)
+        public void ConfigureServices(IServiceCollection services)
         {
-
-            services.AddDbContext<SampleDbContext>(options => options.UseInMemoryDatabase("KutuphaneOtomasyonu"));
+            services.AddDbContext<SampleDbContext>();
 
             IConfigurationSection appSettingsSection = Configuration.GetSection("AppSettings");
             services.Configure<AppSettings>(appSettingsSection);
 
+            #region JWT
             var key = Encoding.ASCII.GetBytes(Configuration["AppSettings:Secret"]);
             services.AddAuthentication(x =>
             {
@@ -59,11 +59,9 @@ namespace sample_service
                     ValidateLifetime = true
                 };
             });
-
-
+            #endregion
 
             services.AddTransient<IUserService, UserService>();
-
 
             services.AddControllers();
 
@@ -111,11 +109,10 @@ namespace sample_service
 
             });
 
-            return services.BuildServiceProvider();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, Microsoft.AspNetCore.Hosting.IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
@@ -157,7 +154,7 @@ namespace sample_service
                 endpoints.MapControllers();
             });
 
-            DbInitializer.Seed(app).Wait();
+            app.SeedData();
         }
     }
 }

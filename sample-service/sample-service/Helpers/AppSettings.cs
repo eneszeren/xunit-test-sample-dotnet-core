@@ -8,6 +8,5 @@ namespace sample_service.Helpers
     public class AppSettings
     {
         public string Secret { get; set; }
-        public string ProjectUrl{ get; set; }
     }
 }

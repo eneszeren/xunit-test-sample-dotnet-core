@@ -1,40 +1,39 @@
 ﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace sample_service.Entities.Sample
 {
-    public class DbInitializer
+    public static class DataSeeder
     {
-        public static async Task Seed(IApplicationBuilder applicationBuilder)
+        public static void SeedData(this IApplicationBuilder app)
         {
-            SampleDbContext context = applicationBuilder.ApplicationServices.GetRequiredService<SampleDbContext>();
+            using (IServiceScope serviceScope = app.ApplicationServices.CreateScope())
+            {
+                var db = serviceScope.ServiceProvider.GetService<SampleDbContext>();
 
-            User user = new User
-            { Id = 1, Firstname = "Kemal", Lastname="Akçıl", Email="kakcil@trabilisim.com", Password="123",CreateDate = DateTime.Now, Status=true };
+                User user = new User
+                { Id = 1, Firstname = "Kemal", Lastname = "Akçıl", Email = "kakcil@trabilisim.com", Password = "123", CreateDate = DateTime.Now, Status = true };
 
-            Country country = new Country
-            { Id = 1, Name = "Türkiye" };
+                Country country = new Country
+                { Id = 1, Name = "Türkiye" };
 
-            City city = new City
-            { Id = 1, Name = "Sakarya", CountryId = 1 };
+                City city = new City
+                { Id = 1, Name = "Sakarya", CountryId = 1 };
 
-            District district = new District
-            { Id = 1, Name = "Adapazarı", CityId = 1 };
+                District district = new District
+                { Id = 1, Name = "Adapazarı", CityId = 1 };
 
-            context.User.Add(user);
+                db.User.Add(user);
 
-            context.Country.Add(country);
+                db.Country.Add(country);
 
-            context.City.Add(city);
+                db.City.Add(city);
 
-            context.District.Add(district);
+                db.District.Add(district);
 
-            context.SaveChanges();
+                db.SaveChanges();
+            }
         }
     }
 }

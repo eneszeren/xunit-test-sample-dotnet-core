@@ -23,35 +23,15 @@ namespace sample_service.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        IUserService _serviceUser;
+        readonly IUserService _serviceUser;
         private readonly AppSettings _appSettings;
-        SampleDbContext _context;
+        readonly SampleDbContext _context;
 
         public UserController(IUserService userService, IOptions<AppSettings> appSettings, SampleDbContext context)
         {
             _serviceUser = userService;
             _appSettings = appSettings.Value;
             _context = context;
-        }
-
-        [HttpGet("test")]
-        public IActionResult test()
-        {
-
-            try
-            {
-                var a = _context.City.ToList();
-                var b = _context.Country.ToList();
-                var c = _context.District.ToList();
-                var d = _context.User.ToList();
-
-                return Ok();
-            }
-            catch (Exception exp)
-            {
-
-                return BadRequest();
-            }
         }
 
         [AllowAnonymous]
@@ -61,7 +41,7 @@ namespace sample_service.Controllers
 
             try
             {
-                if (string.IsNullOrEmpty(loginDto.email) || string.IsNullOrEmpty(loginDto.password))
+                if (string.IsNullOrEmpty(loginDto.Email) || string.IsNullOrEmpty(loginDto.Password))
                     return BadRequest("Login or password can not be empty!");
 
                 GeneralDto.Response response = null;
@@ -76,11 +56,12 @@ namespace sample_service.Controllers
                 JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
                 byte[] key = Encoding.ASCII.GetBytes(_appSettings.Secret);
 
-                List<Claim> claimsList = new List<Claim>();
-
-                claimsList.Add(new Claim(ClaimTypes.Name, user.Id.ToString()));
-                claimsList.Add(new Claim(ClaimTypes.Email, user.Email));
-                claimsList.Add(new Claim(ClaimTypes.NameIdentifier, user.Name));
+                List<Claim> claimsList = new List<Claim>
+                {
+                    new Claim(ClaimTypes.Name, user.Id.ToString()),
+                    new Claim(ClaimTypes.Email, user.Email),
+                    new Claim(ClaimTypes.NameIdentifier, user.Name)
+                };
 
                 SecurityTokenDescriptor tokenDescriptor = new SecurityTokenDescriptor
                 {
@@ -95,7 +76,7 @@ namespace sample_service.Controllers
 
                 return Ok(user);
             }
-            catch (Exception exp)
+            catch (Exception)
             {
 
                 return BadRequest();
@@ -108,20 +89,6 @@ namespace sample_service.Controllers
             return Ok(new GeneralDto.Response());
         }
 
-        [AllowAnonymous]
-        [HttpPost("ResetPassword")]
-        public IActionResult ResetPassword(UserDto.ResetPassword model)
-        {
-            try
-            {
-                return Ok(_serviceUser.ResetPassword(model, Request));
-            }
-            catch (Exception exp)
-            {
-                return BadRequest();
-            }
-        }
-
         [HttpGet("List")]
         public IActionResult List()
         {
@@ -129,7 +96,7 @@ namespace sample_service.Controllers
             {
                 return Ok(_serviceUser.List());
             }
-            catch (Exception exp)
+            catch (Exception)
             {
                 return BadRequest();
             }
@@ -142,7 +109,7 @@ namespace sample_service.Controllers
             {
                 return Ok(_serviceUser.Detail(detail));
             }
-            catch (Exception exp)
+            catch (Exception)
             {
                 return BadRequest();
             }
@@ -157,7 +124,7 @@ namespace sample_service.Controllers
 
                 return Ok(_serviceUser.Delete(delete));
             }
-            catch (Exception exp)
+            catch (Exception)
             {
 
                 return BadRequest();
@@ -173,7 +140,7 @@ namespace sample_service.Controllers
 
                 return Ok(_serviceUser.Save(save, Request));
             }
-            catch (Exception exp)
+            catch (Exception)
             {
 
                 return BadRequest();
@@ -188,7 +155,7 @@ namespace sample_service.Controllers
             {
                 return Ok(_serviceUser.SelectList());
             }
-            catch (Exception exp)
+            catch (Exception)
             {
                 return BadRequest();
             }
@@ -202,7 +169,7 @@ namespace sample_service.Controllers
             {
                 return Ok(_serviceUser.GetUserGetUserEmail(userId));
             }
-            catch (Exception exp)
+            catch (Exception)
             {
                 return BadRequest();
             }

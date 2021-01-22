@@ -9,6 +9,15 @@ namespace sample_service.Dtos
     {
         public class Response
         {
+              public Response(bool isError = false)
+            {
+                if (isError == true)
+                {
+                    Error = true;
+                    Message = "An error was occured!";
+                }
+            }
+
             public bool Error { get; set; }
             public string Message { get; set; }
             public object Data { get; set; }
@@ -19,20 +28,27 @@ namespace sample_service.Dtos
         {
             public int Id { get; set; }
         }
+
         public class Delete : Detail
         {
             public int UserId { get; set; } = 0;
         }
-        public class Select
+
+        public class DetailRequest
         {
-            public string label { get; set; }
-            public object value { get; set; }
-            public object common { get; set; }
+            public int Id { get; set; }
         }
 
-        public class UserSelect:Select
+        public class Select
         {
-            public string email { get; set; }
+            public string Label { get; set; }
+            public object Value { get; set; }
+            public object Common { get; set; }
+        }
+
+        public class UserSelect : Select
+        {
+            public string Email { get; set; }
         }
     }
 }

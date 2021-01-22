@@ -16,7 +16,6 @@ namespace sample_service.Services
     {
 
         GeneralDto.Response Login(UserDto.LoginRequest login, HttpRequest request);
-        GeneralDto.Response ResetPassword(UserDto.ResetPassword model, HttpRequest request);
         GeneralDto.Response Detail(GeneralDto.Detail id);
         GeneralDto.Response Save(UserDto.Save save, HttpRequest request);
         GeneralDto.Response Delete(GeneralDto.Delete id);
@@ -27,10 +26,10 @@ namespace sample_service.Services
 
     public class UserService : IUserService
     {
-        SampleDbContext _context;
-        AppSettings _appSettings;
+        readonly SampleDbContext _context;
+        readonly AppSettings _appSettings;
 
-        public UserService(SampleDbContext context,IOptions<AppSettings> options)
+        public UserService(SampleDbContext context, IOptions<AppSettings> options)
         {
             _context = context;
             _appSettings = options.Value;
@@ -41,7 +40,7 @@ namespace sample_service.Services
             try
             {
                 User user = _context.User
-                    .Where(w => w.Email == login.email && w.Password == login.password && w.Status.GetValueOrDefault(true))
+                    .Where(w => w.Email == login.Email && w.Password == login.Password && w.Status.GetValueOrDefault(true))
                     .FirstOrDefault();
                 if (user == null)
                     return null;
@@ -57,37 +56,7 @@ namespace sample_service.Services
             }
             catch (Exception exp)
             {
-
-                return new GeneralDto.Response() { Error = true, Message = "An error was occured!" };
-            }
-        }
-
-        public GeneralDto.Response ResetPassword(UserDto.ResetPassword model, HttpRequest request)
-        {
-            try
-            {
-                if (string.IsNullOrEmpty(model.Token) || string.IsNullOrEmpty(model.Password) || model.Password != model.ConfirmPassword)
-                    return new GeneralDto.Response() { Error = true, Message = "All areas are required!" };
-                if (model.Password.Length < 6)
-                    return new GeneralDto.Response() { Error = true, Message = "Password length must be at least 6 characters" };
-
-                User user = _context.User.Where(w => w.Email == model.Email).FirstOrDefault();
-                if (user == null)
-                    return new GeneralDto.Response() { Error = true, Message = "Invalid email address for your token" };
-
-                string token = $"{user.Email}{user.Password}{user.Firstname}{user.Lastname}";
-                if (token != model.Token)
-                    return new GeneralDto.Response() { Error = true, Message = "Invalid token!" };
-
-                user.Password = model.Password;
-                _context.SaveChanges();
-
-                return new GeneralDto.Response() { Error = false, Message = "Your password has been successfully updated." };
-            }
-            catch (Exception exp)
-            {
-
-                return new GeneralDto.Response() { Error = true, Message = "An error was occured!" };
+                return new GeneralDto.Response() { Error = true, Message = exp.ToString() };
             }
         }
 
@@ -109,8 +78,7 @@ namespace sample_service.Services
             }
             catch (Exception exp)
             {
-
-                return new GeneralDto.Response() { Error = true, Message = "An error was occured!" + exp.ToString() };
+                return new GeneralDto.Response() { Error = true, Message = exp.ToString() };
             }
         }
 
@@ -140,7 +108,7 @@ namespace sample_service.Services
             catch (Exception exp)
             {
 
-                return new GeneralDto.Response() { Error = true, Message = "An error was occured!" };
+                return new GeneralDto.Response() { Error = true, Message = exp.ToString() };
             }
         }
 
@@ -184,8 +152,7 @@ namespace sample_service.Services
             }
             catch (Exception exp)
             {
-
-                return new GeneralDto.Response() { Error = true, Message = "An error was occured!" };
+                return new GeneralDto.Response() { Error = true, Message = exp.ToString() };
             }
         }
 
@@ -210,7 +177,7 @@ namespace sample_service.Services
             catch (Exception exp)
             {
 
-                return new GeneralDto.Response() { Error = true, Message = "An error was occured!" };
+                return new GeneralDto.Response() { Error = true, Message = exp.ToString() };
             }
         }
 
@@ -221,12 +188,12 @@ namespace sample_service.Services
                 return _context.User
                     .Select(s => new GeneralDto.UserSelect()
                     {
-                        value = s.Id,
-                        label = string.Concat(s.Firstname, " ", s.Lastname),
-                        email = s.Email
+                        Value = s.Id,
+                        Label = string.Concat(s.Firstname, " ", s.Lastname),
+                        Email = s.Email
                     }).ToList();
             }
-            catch (Exception exp)
+            catch (Exception)
             {
 
                 return new List<GeneralDto.UserSelect>();
@@ -254,7 +221,7 @@ namespace sample_service.Services
             catch (Exception exp)
             {
 
-                return new GeneralDto.Response() { Error = true, Message = "An error was occured!" };
+                return new GeneralDto.Response() { Error = true, Message = exp.ToString() };
             }
         }
 
